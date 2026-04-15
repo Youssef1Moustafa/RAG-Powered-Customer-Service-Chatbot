@@ -416,5 +416,5 @@ lxml
 
 \*Built as a Proof of Concept for Telecom Egypt customer service automation.\*  
 
-\*All data sourced from the official website: https://te.eg\*
+\*All data sourced from the official website: https://te.eg/wps/portal/te/Personal*
 
