@@ -1,4 +1,4 @@
-\# 📞 Telecom Egypt Intelligent Assistant (WE Chatbot)
+\ 📞 Telecom Egypt Intelligent Assistant (WE Chatbot)
 
 
 
@@ -10,7 +10,7 @@
 
 
 
-\ ##System Overview
+\ System Overview
 
 
 
@@ -60,7 +60,7 @@ User Question
 
 
 
-\## 📁 Project Structure
+\ 📁 Project Structure
 
 
 
@@ -100,7 +100,7 @@ project/
 
 
 
-\## ⚙️ Prerequisites
+\ ⚙️ Prerequisites
 
 
 
@@ -116,7 +116,7 @@ project/
 
 
 
-\### Install Tesseract (Windows)
+\ Install Tesseract (Windows)
 
 Download from: https://github.com/UB-Mannheim/tesseract/wiki  
 
@@ -130,11 +130,11 @@ Add Arabic language pack during installation.
 
 
 
-\## 🚀 Setup \& Installation
+\ 🚀 Setup \& Installation
 
 
 
-\### Step 1 — Clone / Download the project
+\ Step 1 — Clone / Download the project
 
 ```bash
 
@@ -144,7 +144,7 @@ cd C:\\your\\path\\
 
 
 
-\### Step 2 — Create virtual environment
+\ Step 2 — Create virtual environment
 
 ```bash
 
@@ -156,7 +156,7 @@ venv\\Scripts\\activate
 
 
 
-\### Step 3 — Install dependencies
+\ Step 3 — Install dependencies
 
 ```bash
 
@@ -168,7 +168,7 @@ pip install -r requirements.txt
 
 
 
-\### Step 4 — Install Ollama models
+\ Step 4 — Install Ollama models
 
 ```bash
 
@@ -182,7 +182,7 @@ ollama pull nomic-embed-text  # Embeddings model (\~274MB)
 
 
 
-\### Step 5 — Scrape the website (first time only)
+\ Step 5 — Scrape the website (first time only)
 
 ```bash
 
@@ -198,7 +198,7 @@ This creates `data/website\_pages/` with \~40 pages from te.eg.
 
 
 
-\## ▶️ Running the App
+\ ▶️ Running the App
 
 
 
@@ -230,7 +230,7 @@ Open your browser at: \*\*http://localhost:8501\*\*
 
 
 
-\## 💬 How to Use
+\ 💬 How to Use
 
 
 
@@ -244,7 +244,7 @@ Open your browser at: \*\*http://localhost:8501\*\*
 
 
 
-\### Example Questions
+\ Example Questions
 
 \- `ما هي باقات الإنترنت المتاحة؟`
 
@@ -260,7 +260,7 @@ Open your browser at: \*\*http://localhost:8501\*\*
 
 
 
-\## 📂 Supported File Formats
+\ 📂 Supported File Formats
 
 
 
@@ -284,7 +284,7 @@ Open your browser at: \*\*http://localhost:8501\*\*
 
 
 
-\## 🔧 Configuration
+\ 🔧 Configuration
 
 
 
@@ -318,7 +318,7 @@ search\_kwargs={"k": 6}      # Number of chunks retrieved
 
 
 
-\## 🏗️ System Architecture
+\ 🏗️ System Architecture
 
 
 
@@ -348,7 +348,7 @@ search\_kwargs={"k": 6}      # Number of chunks retrieved
 
 
 
-\## ❗ Troubleshooting
+\ ❗ Troubleshooting
 
 
 
@@ -372,7 +372,7 @@ search\_kwargs={"k": 6}      # Number of chunks retrieved
 
 
 
-\## 📋 Requirements
+\ 📋 Requirements
 
 
 
