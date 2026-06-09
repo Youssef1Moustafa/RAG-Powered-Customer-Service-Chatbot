@@ -104,7 +104,7 @@ def clean_text(text):
 # استخراج المحتوى
 # =========================================
 def extract_text(html):
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoup(html, "html.parser")
 
     # remove noise
     for tag in soup(["script", "style", "nav", "footer", "header", "noscript", "svg", "button"]):
