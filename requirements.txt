@@ -12,6 +12,5 @@ beautifulsoup4==4.12.3
 requests==2.31.0
 pypdf==4.0.1
 python-docx==1.1.0
-pytesseract==0.3.10
 langdetect==1.0.9
 html5lib==1.1
