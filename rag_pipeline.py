@@ -191,8 +191,11 @@ class TelecomRAG:
                 self.vectorstore = Chroma(persist_directory=self.persist_dir,embedding_function=self.embeddings)
                 retriever = self.vectorstore.as_retriever(search_type="mmr",search_kwargs={"k": 6, "fetch_k": 20, "lambda_mult": 0.7})
                 self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm,chain_type="stuff",retriever=retriever,chain_type_kwargs={"prompt": self.prompt},return_source_documents=True)
-            return True
-         return False
+                return True
+            except Exception as e:
+                print(f"⚠️ خطأ في تحميل قاعدة البيانات: {e}")
+                return False
+        return False
    
         
     
