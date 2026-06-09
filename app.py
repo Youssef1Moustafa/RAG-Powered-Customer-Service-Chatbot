@@ -88,7 +88,7 @@ with st.sidebar:
         help="النماذج الأكبر تعطي نتائج أفضل لكن أبطأ"
     )
     
-    if model_option != st.session_state.rag.llm.model:
+    if model_option != st.session_state.rag.llm.model_name:
         st.session_state.rag = TelecomRAG(model_name=model_option)
         st.session_state.initialized = False
         st.rerun()
