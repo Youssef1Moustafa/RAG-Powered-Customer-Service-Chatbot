@@ -69,7 +69,7 @@ st.markdown("""
 
 # Initialize session state
 if 'rag' not in st.session_state:
-    st.session_state.rag = TelecomRAG(model_name="llama3-70b-8192")
+    st.session_state.rag = TelecomRAG(model_name="llama-3.1-8b-instant")
 
 if 'messages' not in st.session_state:
     st.session_state.messages = []
@@ -84,7 +84,7 @@ with st.sidebar:
     # اختيار النموذج
     model_option = st.selectbox(
         "اختر نموذج اللغة",
-        ["llama3-70b-8192", "llama3-8b-8192", "gemma2-9b-it"],
+        ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "qwen/qwen3-32b"],
         help="النماذج الأكبر تعطي نتائج أفضل لكن أبطأ"
     )
     
