@@ -36,9 +36,9 @@ class TelecomRAG:
             model_name: اسم نموذج Ollama (llama3.2:3b أو llama3.2:1b)
         """
         # إعدادات النماذج
-        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2",model_kwargs={'device': 'cpu'},encode_kwargs={'normalize_embeddings': False})
+        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-mpnet-base-v2",model_kwargs={'device': 'cpu'},encode_kwargs={'normalize_embeddings': False})
         
-        self.llm = ChatGroq(model=model_name,temperature=0.3,api_key=os.getenv("GROQ_API_KEY"))
+        self.llm = ChatGroq(model=model_name,temperature=0.6,api_key=os.getenv("GROQ_API_KEY"))
         
         # مكان حفظ قاعدة البيانات
         self.persist_dir = os.path.join(tempfile.gettempdir(), "chroma_db")
@@ -168,9 +168,9 @@ class TelecomRAG:
         retriever = self.vectorstore.as_retriever(
     search_type="mmr",
     search_kwargs={
-        "k": 6,
-        "fetch_k": 20,
-        "lambda_mult": 0.7
+        "k": 4,
+        "fetch_k": 12,
+        "lambda_mult": 0.5
     }
 )
         
@@ -189,7 +189,7 @@ class TelecomRAG:
         if os.path.exists(self.persist_dir):
             try:
                 self.vectorstore = Chroma(persist_directory=self.persist_dir,embedding_function=self.embeddings)
-                retriever = self.vectorstore.as_retriever(search_type="mmr",search_kwargs={"k": 6, "fetch_k": 20, "lambda_mult": 0.7})
+                retriever = self.vectorstore.as_retriever(search_type="mmr",search_kwargs={"k": 4, "fetch_k": 12, "lambda_mult": 0.5})
                 self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm,chain_type="stuff",retriever=retriever,chain_type_kwargs={"prompt": self.prompt},return_source_documents=True)
                 return True
             except Exception as e:
@@ -199,7 +199,7 @@ class TelecomRAG:
    
         
     
-    def query(self, question: str) -> Tuple[str, List[str]]:
+    def query(self, question: str, chat_history=None) -> Tuple[str, List[str]]:
         """
         إرسال سؤال إلى البوت
         
@@ -218,7 +218,25 @@ class TelecomRAG:
                 lang = "ar"
             
             # 🔧 تم التعديل: استخدام invoke بدل الاتصال المباشر
-            result = self.qa_chain.invoke({"query": f"User language: {lang}\nQuestion: {question}"})
+            history_text = ""
+
+            if chat_history:
+                for msg in chat_history[-8:]:
+                    history_text += f"{msg['role']}: {msg['content']}\n"
+            result = self.qa_chain.invoke(
+                {
+                    "query": f"""
+            Previous Conversation:
+            {history_text}
+
+             User Language: {lang}
+
+             Current Question:
+             {question}
+             """
+    }
+)
+    
             response = result['result']
 
             response = response.strip()
@@ -274,7 +292,7 @@ class TelecomRAG:
             
         
             # إعادة بناء الـ chain مع البيانات الجديدة
-            retriever = self.vectorstore.as_retriever(search_type="mmr",search_kwargs={"k": 6,"fetch_k": 20,"lambda_mult": 0.7})
+            retriever = self.vectorstore.as_retriever(search_type="mmr",search_kwargs={"k": 4,"fetch_k": 12,"lambda_mult": 0.5})
             self.qa_chain = RetrievalQA.from_chain_type(
     llm=self.llm,
     chain_type="stuff",
