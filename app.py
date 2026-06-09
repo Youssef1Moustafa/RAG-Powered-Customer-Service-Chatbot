@@ -10,7 +10,7 @@ import os
 
 # إعدادات الصفحة
 st.set_page_config(
-    page_title="WE Assistant - Telecom Egypt",
+    page_title="we Assistant - Telecom Egypt",
     page_icon="📞",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -61,7 +61,7 @@ st.markdown("""
 # العنوان الرئيسي
 st.markdown("""
 <div class="main-header">
-    <h1>📞 WE Intelligent Assistant</h1>
+    <h1>📞 we Intelligent Assistant</h1>
     <p>خدمة عملاء ذكية - مدعومة بالذكاء الاصطناعي</p>
 </div>
 """, unsafe_allow_html=True)
