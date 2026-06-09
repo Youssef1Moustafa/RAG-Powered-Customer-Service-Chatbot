@@ -17,6 +17,7 @@ import glob
 from langdetect import detect
 import re
 import tempfile 
+import shutil
 
 
 def clean_text(text: str) -> str:
@@ -209,6 +210,9 @@ FINAL ANSWER
         
         print("🔄 جاري إنشاء embeddings والتخزين...")
         # 🔧 تم التعديل: إزالة persist() لأن Chroma 0.4.x يحفظ تلقائيًا
+        if os.path.exists(self.persist_dir):
+            shutil.rmtree(self.persist_dir)
+    
         self.vectorstore = Chroma.from_texts(
             texts=all_chunks,
             embedding=self.embeddings,
