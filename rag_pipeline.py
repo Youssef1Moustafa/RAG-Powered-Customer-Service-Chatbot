@@ -7,6 +7,7 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 #from langchain_ollama import OllamaEmbeddings, OllamaLLM
 from langchain_groq import ChatGroq
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
@@ -33,16 +34,9 @@ class TelecomRAG:
             model_name: اسم نموذج Ollama (llama3.2:3b أو llama3.2:1b)
         """
         # إعدادات النماذج
-        self.embeddings = OllamaEmbeddings(
-            model="nomic-embed-text",
-            #base_url="http://localhost:11434"
-        )
+        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
         
-        self.llm = OllamaLLM(
-            model=model_name,
-            temperature=0.3,
-            #base_url="http://localhost:11434"
-        )
+        self.llm = ChatGroq(model="llama3-70b-8192",temperature=0.3,api_key=os.getenv("GROQ_API_KEY"))
         
         # مكان حفظ قاعدة البيانات
         self.persist_dir = "data/chroma_db"
