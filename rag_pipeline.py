@@ -26,7 +26,7 @@ def clean_text(text: str) -> str:
     
     return text.strip()
 class TelecomRAG:
-    def __init__(self, model_name: str = "mistral"):
+    def __init__(self, model_name: str = "llama3-70b-8192"):
         """
         تهيئة نظام RAG
         
@@ -36,7 +36,7 @@ class TelecomRAG:
         # إعدادات النماذج
         self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
         
-        self.llm = ChatGroq(model="llama3-70b-8192",temperature=0.3,api_key=os.getenv("GROQ_API_KEY"))
+        self.llm = ChatGroq(model=model_name,temperature=0.3,api_key=os.getenv("GROQ_API_KEY"))
         
         # مكان حفظ قاعدة البيانات
         self.persist_dir = "data/chroma_db"
