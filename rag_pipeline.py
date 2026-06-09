@@ -5,7 +5,8 @@ RAG Pipeline للـ Telecom Egypt Chatbot - نسخة محدثة
 
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_ollama import OllamaEmbeddings, OllamaLLM
+#from langchain_ollama import OllamaEmbeddings, OllamaLLM
+from langchain_groq import ChatGroq
 from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
