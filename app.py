@@ -84,7 +84,7 @@ with st.sidebar:
     # اختيار النموذج
     model_option = st.selectbox(
         "اختر نموذج اللغة",
-        ["llama3.2:3b", "llama3.2:1b", "mistral"],
+        ["llama3-70b-8192", "llama3-8b-8192", "gemma2-9b-it"],
         help="النماذج الأكبر تعطي نتائج أفضل لكن أبطأ"
     )
     
