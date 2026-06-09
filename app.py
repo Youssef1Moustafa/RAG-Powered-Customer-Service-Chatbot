@@ -207,7 +207,7 @@ if prompt := st.chat_input("اسأل عن الباقات، الشحن، الدع
             sources = []
         else:
             with st.spinner("🤔 بفكر في إجابتك..."):
-                response, sources = st.session_state.rag.query(prompt,st.session_state.messages)
+                response, sources = st.session_state.rag.query(prompt, st.session_state.messages[-10:])
         
         st.markdown(response)
         
