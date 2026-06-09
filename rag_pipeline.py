@@ -36,7 +36,7 @@ class TelecomRAG:
             model_name: اسم نموذج Ollama (llama3.2:3b أو llama3.2:1b)
         """
         # إعدادات النماذج
-        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2",model_kwargs={'device': 'cpu'},encode_kwargs={'normalize_embeddings': False})
         
         self.llm = ChatGroq(model=model_name,temperature=0.3,api_key=os.getenv("GROQ_API_KEY"))
         
