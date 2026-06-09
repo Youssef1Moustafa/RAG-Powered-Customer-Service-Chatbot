@@ -23,7 +23,7 @@ except:
     pytesseract = None
 import platform
 
-if platform.system() == "Windows":
+if pytesseract and platform.system() == "Windows":
     pytesseract.pytesseract.tesseract_cmd = \
     r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 def process_pdf(file_path: str) -> str:
