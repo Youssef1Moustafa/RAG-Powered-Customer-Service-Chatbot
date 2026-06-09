@@ -69,7 +69,7 @@ st.markdown("""
 
 # Initialize session state
 if 'rag' not in st.session_state:
-    st.session_state.rag = TelecomRAG(model_name="llama3.2:3b")
+    st.session_state.rag = TelecomRAG(model_name="llama3-70b-8192")
 
 if 'messages' not in st.session_state:
     st.session_state.messages = []
