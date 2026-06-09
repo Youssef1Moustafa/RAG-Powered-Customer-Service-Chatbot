@@ -37,7 +37,7 @@ class TelecomRAG:
             model_name: اسم نموذج Ollama (llama3.2:3b أو llama3.2:1b)
         """
         # إعدادات النماذج
-        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-mpnet-base-v2",model_kwargs={'device': 'cpu'},encode_kwargs={'normalize_embeddings': False})
+        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",model_kwargs={'device': 'cpu'},encode_kwargs={'normalize_embeddings': True})
         
         self.llm = ChatGroq(model=model_name,temperature=0.6,api_key=os.getenv("GROQ_API_KEY"))
         
@@ -300,19 +300,17 @@ FINAL ANSWER
             
             # استخراج المصادر
             sources = []
-            valid_sources = []
-
             for doc in result.get('source_documents', []):
-                 
-                 source = doc.metadata.get('source', '')
+                source = doc.metadata.get('source', '')
+                title = doc.metadata.get('title', '')
+                
                  # فلترة اللينكات الغلط
                  if "te.eg" in source or "we.com.eg" in source:
-                      
-                      valid_sources.append(source)
+                     sources.append(f"{title} - {source}" if title != "No title" else source)
         
 
             # إزالة التكرار
-            sources = list(set(valid_sources))
+            sources = list(dict.fromkeys(sources))
             
             return response, sources
             
