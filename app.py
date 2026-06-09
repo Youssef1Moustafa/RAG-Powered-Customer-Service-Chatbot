@@ -73,6 +73,11 @@ if 'rag' not in st.session_state:
 
 if 'messages' not in st.session_state:
     st.session_state.messages = []
+    
+# ✅ أضف هنا - تنظيف الـ messages
+MAX_MESSAGES = 20
+if len(st.session_state.messages) > MAX_MESSAGES:
+    st.session_state.messages = st.session_state.messages[-MAX_MESSAGES:]
 
 if 'initialized' not in st.session_state:
     st.session_state.initialized = False
