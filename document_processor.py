@@ -66,6 +66,9 @@ def process_txt(file_path: str) -> str:
 
 def process_image(file_path: str) -> str:
     """استخراج النص من الصور باستخدام OCR"""
+    # ✅ Check if running in cloud
+    if os.environ.get('STREAMLIT_SHARING') or os.environ.get('RENDER'):
+        return "⚠️ رفع الصور غير متاح حاليًا. الرجاء رفع PDF أو TXT."
     try:
         if pytesseract is None:
             return "⚠️ OCR غير متاح (Tesseract غير مثبت)"
