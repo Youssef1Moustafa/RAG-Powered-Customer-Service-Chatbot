@@ -34,13 +34,13 @@ class TelecomRAG:
         # إعدادات النماذج
         self.embeddings = OllamaEmbeddings(
             model="nomic-embed-text",
-            base_url="http://localhost:11434"
+            #base_url="http://localhost:11434"
         )
         
         self.llm = OllamaLLM(
             model=model_name,
             temperature=0.3,
-            base_url="http://localhost:11434"
+            #base_url="http://localhost:11434"
         )
         
         # مكان حفظ قاعدة البيانات
