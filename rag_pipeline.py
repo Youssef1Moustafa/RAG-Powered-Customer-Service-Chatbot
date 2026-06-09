@@ -42,7 +42,7 @@ class TelecomRAG:
         self.llm = ChatGroq(model=model_name,temperature=0.6,api_key=os.getenv("GROQ_API_KEY"))
         
         # مكان حفظ قاعدة البيانات
-        self.persist_dir = os.path.join(tempfile.gettempdir(), "chroma_db")
+        self.persist_dir = os.path.join(tempfile.gettempdir(), "chroma_db_new")
         
         # تقسيم النصوص (Chunking)
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -212,6 +212,7 @@ FINAL ANSWER
         # 🔧 تم التعديل: إزالة persist() لأن Chroma 0.4.x يحفظ تلقائيًا
         if os.path.exists(self.persist_dir):
             shutil.rmtree(self.persist_dir)
+            print(f"🗑️ تم حذف قاعدة البيانات القديمة")
     
         self.vectorstore = Chroma.from_texts(
             texts=all_chunks,
