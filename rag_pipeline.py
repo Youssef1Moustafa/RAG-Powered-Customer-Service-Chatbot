@@ -16,6 +16,8 @@ from typing import List, Tuple, Dict
 import glob
 from langdetect import detect
 import re
+import tempfile 
+
 
 def clean_text(text: str) -> str:
     # إزالة unicode invalid
@@ -39,7 +41,7 @@ class TelecomRAG:
         self.llm = ChatGroq(model=model_name,temperature=0.3,api_key=os.getenv("GROQ_API_KEY"))
         
         # مكان حفظ قاعدة البيانات
-        self.persist_dir = "data/chroma_db"
+        self.persist_dir = os.path.join(tempfile.gettempdir(), "chroma_db")
         
         # تقسيم النصوص (Chunking)
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -184,28 +186,15 @@ class TelecomRAG:
         return True
     
     def load_existing_vectorstore(self) -> bool:
-        """تحميل قاعدة البيانات الموجودة"""
         if os.path.exists(self.persist_dir):
             try:
-                self.vectorstore = Chroma(
-                    persist_directory=self.persist_dir,
-                    embedding_function=self.embeddings
-                )
-                
-                retriever = self.vectorstore.as_retriever(search_kwargs={"k": 4})
-                self.qa_chain = RetrievalQA.from_chain_type(
-                    llm=self.llm,
-                    chain_type="stuff",
-                    retriever=retriever,
-                    chain_type_kwargs={"prompt": self.prompt},
-                    return_source_documents=True
-                )
-                print("✅ تم تحميل قاعدة البيانات الموجودة")
-                return True
-            except Exception as e:
-                print(f"⚠️ خطأ في تحميل قاعدة البيانات: {e}")
+                self.vectorstore = Chroma(persist_directory=self.persist_dir,embedding_function=self.embeddings)
+                retriever = self.vectorstore.as_retriever(search_type="mmr",search_kwargs={"k": 6, "fetch_k": 20, "lambda_mult": 0.7})
+                self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm,chain_type="stuff",retriever=retriever,chain_type_kwargs={"prompt": self.prompt},return_source_documents=True)
+            return True
+         return False
+   
         
-        return False
     
     def query(self, question: str) -> Tuple[str, List[str]]:
         """
