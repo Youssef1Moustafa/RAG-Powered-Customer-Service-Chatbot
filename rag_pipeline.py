@@ -48,7 +48,7 @@ class TelecomRAG:
         self.llm = ChatGroq(model=model_name,temperature=0.6,api_key=os.getenv("GROQ_API_KEY"))
         
         # مكان حفظ قاعدة البيانات
-        self.persist_dir = os.path.join(tempfile.gettempdir(), "chroma_db")
+        self.persist_dir = os.path.join(tempfile.gettempdir(), f"chroma_db_{model_name}")
         
         # تقسيم النصوص (Chunking)
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -296,6 +296,11 @@ FINAL ANSWER
         print("🔄 جاري إنشاء embeddings والتخزين...")
         # 🔧 تم التعديل: إزالة persist() لأن Chroma 0.4.x يحفظ تلقائيًا
         try:
+            self.vectorstore = None
+            self.qa_chain = None
+
+            import gc
+            gc.collect()
             if os.path.exists(self.persist_dir):
                 shutil.rmtree(self.persist_dir)
         except Exception as e:
