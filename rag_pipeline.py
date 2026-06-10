@@ -297,7 +297,8 @@ FINAL ANSWER
     llm=self.llm,
     chain_type="stuff",
     retriever=retriever,
-    chain_type_kwargs={"prompt": self.prompt},
+    chain_type_kwargs={"prompt": self.prompt,
+                      "document_variable_name": "context"},
     return_source_documents=True
 )
         
@@ -309,7 +310,7 @@ FINAL ANSWER
             try:
                 self.vectorstore = Chroma(persist_directory=self.persist_dir,embedding_function=self.embeddings)
                 retriever = self.vectorstore.as_retriever(search_type="similarity",search_kwargs={"k": 5})
-                self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm,chain_type="stuff",retriever=retriever,chain_type_kwargs={"prompt": self.prompt},return_source_documents=True)
+                self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm,chain_type="stuff",retriever=retriever,chain_type_kwargs={"prompt": self.prompt,"document_variable_name": "context"},return_source_documents=True)
                 return True
             except Exception as e:
                 print(f"⚠️ خطأ في تحميل قاعدة البيانات: {e}")
@@ -342,19 +343,9 @@ FINAL ANSWER
             if chat_history:
                 for msg in chat_history[-8:]:
                     history_text += f"{msg['role']}: {msg['content']}\n"
-            result = self.qa_chain.invoke(
-                {
-                    "query": f"""
-            Previous Conversation:
-            {history_text}
-
-             User Language: {lang}
-
-             Current Question:
-             {question}
-             """
-    }
-)
+            result = self.qa_chain.invoke({
+                "query": question,
+                "history": history_text})
     
             response = result['result']
 
@@ -413,7 +404,8 @@ FINAL ANSWER
     llm=self.llm,
     chain_type="stuff",
     retriever=retriever,
-    chain_type_kwargs={"prompt": self.prompt},
+    chain_type_kwargs={"prompt": self.prompt,
+                      "document_variable_name": "context"},
     return_source_documents=True
 )
             
