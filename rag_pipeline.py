@@ -305,11 +305,10 @@ FINAL ANSWER
                 source = doc.metadata.get('source', '')
                 title = doc.metadata.get('title', '')
                 
-                 # فلترة اللينكات الغلط
-                 if "te.eg" in source or "we.com.eg" in source:
-                     sources.append(f"{title} - {source}" if title != "No title" else source)
-        
-
+                # فلترة اللينكات الغلط
+                if "te.eg" in source or "we.com.eg" in source:
+                    sources.append(f"{title} - {source}" if title != "No title" else source)
+            
             # إزالة التكرار
             sources = list(dict.fromkeys(sources))
             
