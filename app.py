@@ -94,7 +94,13 @@ with st.sidebar:
     )
     
     if model_option != st.session_state.rag.llm.model_name:
-        st.session_state.rag = TelecomRAG(model_name=model_option)
+        st.session_state.messages = []
+        if hasattr(st.session_state.rag, "vectorstore"):
+            st.session_state.rag.vectorstore = None
+         
+        st.session_state.rag = TelecomRAG(
+            model_name=model_option
+        )
         st.session_state.initialized = False
         st.rerun()
     
