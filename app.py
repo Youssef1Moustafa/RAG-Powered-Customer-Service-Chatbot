@@ -91,7 +91,7 @@ with st.sidebar:
     # اختيار النموذج
     model_option = st.selectbox(
         "اختر نموذج اللغة",
-        ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"],
+        ["llama-3.3-70b-versatile","openai/gpt-oss-120b","qwen/qwen3-32b","llama-3.1-8b-instant"],
         help="النماذج الأكبر تعطي نتائج أفضل لكن أبطأ"
     )
     
