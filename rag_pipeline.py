@@ -24,7 +24,7 @@ from langdetect import detect
 import re
 import tempfile 
 import shutil
-
+import uuid
 
 def clean_text(text: str) -> str:
     # إزالة unicode invalid
@@ -47,8 +47,10 @@ class TelecomRAG:
         
         self.llm = ChatGroq(model=model_name,temperature=0.6,api_key=os.getenv("GROQ_API_KEY"))
         
-        # مكان حفظ قاعدة البيانات
-        self.persist_dir = os.path.join(tempfile.gettempdir(), f"chroma_db_{model_name}")
+        # استخدم اسم فريد مع time أو random
+        self.persist_dir = os.path.join(tempfile.gettempdir(), f"chroma_db_{uuid.uuid4().hex[:8]}")
+
+
         
         # تقسيم النصوص (Chunking)
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -309,7 +311,8 @@ FINAL ANSWER
             texts=all_chunks,
             embedding=self.embeddings,
             metadatas=all_metadatas,
-            persist_directory=self.persist_dir
+            persist_directory=self.persist_dir,
+            collection_name=f"we_collection_{model_name.replace('-', '_')}"  # اسم فريد لكل مودل
         )
         
         # بناء سلسلة الـ RAG
