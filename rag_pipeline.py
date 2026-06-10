@@ -311,9 +311,7 @@ FINAL ANSWER
             texts=all_chunks,
             embedding=self.embeddings,
             metadatas=all_metadatas,
-            persist_directory=self.persist_dir,
-            collection_name=f"we_collection_{model_name.replace('-', '_')}"  # اسم فريد لكل مودل
-        )
+            persist_directory=self.persist_dir)
         
         # بناء سلسلة الـ RAG
         retriever = self.vectorstore.as_retriever(
@@ -433,7 +431,7 @@ FINAL ANSWER
                 texts=chunks,
                 embedding=self.embeddings,
                 metadatas=metadatas,
-                persist_directory=self.persist_dir
+                persist_directory=self.persist_dir               
             )
             
         
