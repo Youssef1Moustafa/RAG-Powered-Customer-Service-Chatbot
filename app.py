@@ -130,7 +130,7 @@ with st.sidebar:
     # رفع الملفات
     st.header("📁 رفع مستندات")
     uploaded_files = st.file_uploader(
-        "ارفع ملفاتك (PDF, DOCX, TXT, صورة, HTML)",
+        "ارفع ملفاتك (PDF, DOCX, TXT, IMAGE, HTML)",
         type=['pdf', 'docx', 'txt', 'png', 'jpg', 'jpeg', 'html', 'htm'],
         accept_multiple_files=True
     )
