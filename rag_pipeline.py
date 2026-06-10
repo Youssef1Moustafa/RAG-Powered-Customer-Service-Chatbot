@@ -48,7 +48,7 @@ class TelecomRAG:
         self.llm = ChatGroq(model=model_name,temperature=0.6,api_key=os.getenv("GROQ_API_KEY"))
         
         # مكان حفظ قاعدة البيانات
-        self.persist_dir = os.path.join(tempfile.gettempdir(), "data/chroma_db")
+        self.persist_dir = os.path.join(tempfile.gettempdir(), "chroma_db")
         
         # تقسيم النصوص (Chunking)
         self.text_splitter = RecursiveCharacterTextSplitter(
