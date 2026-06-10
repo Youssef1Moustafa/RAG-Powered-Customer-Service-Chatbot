@@ -288,8 +288,8 @@ FINAL ANSWER
         retriever = self.vectorstore.as_retriever(
     search_type="similarity",
     search_kwargs={
-        "k": 5,
-        "score_threshold": 0.4
+        "k": 5
+        
     }
 )
         
@@ -308,7 +308,7 @@ FINAL ANSWER
         if os.path.exists(self.persist_dir):
             try:
                 self.vectorstore = Chroma(persist_directory=self.persist_dir,embedding_function=self.embeddings)
-                retriever = self.vectorstore.as_retriever(search_type="similarity",search_kwargs={"k": 5, "score_threshold": 0.4})
+                retriever = self.vectorstore.as_retriever(search_type="similarity",search_kwargs={"k": 5})
                 self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm,chain_type="stuff",retriever=retriever,chain_type_kwargs={"prompt": self.prompt},return_source_documents=True)
                 return True
             except Exception as e:
@@ -408,7 +408,7 @@ FINAL ANSWER
             
         
             # إعادة بناء الـ chain مع البيانات الجديدة
-            retriever = self.vectorstore.as_retriever(search_type="similarity",search_kwargs={"k": 5,"score_threshold": 0.4})
+            retriever = self.vectorstore.as_retriever(search_type="similarity",search_kwargs={"k": 5})
             self.qa_chain = RetrievalQA.from_chain_type(
     llm=self.llm,
     chain_type="stuff",
