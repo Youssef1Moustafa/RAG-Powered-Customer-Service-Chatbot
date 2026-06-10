@@ -66,18 +66,26 @@ def process_txt(file_path: str) -> str:
 
 def process_image(file_path: str) -> str:
     """استخراج النص من الصور باستخدام OCR"""
+    
     # ✅ Check if running in cloud
     if os.environ.get('STREAMLIT_SHARING') or os.environ.get('RENDER'):
-        return "⚠️ رفع الصور غير متاح حاليًا. الرجاء رفع PDF أو TXT."
-    try:
-        if pytesseract is None:
-            return "⚠️ OCR غير متاح (Tesseract غير مثبت)"
-        image = Image.open(file_path)
-        # استخدام pytesseract مع دعم اللغة العربية
-        text = pytesseract.image_to_string(image, lang='ara+eng')
-        return text
-    except Exception as e:
-        return f"خطأ في معالجة الصورة: {e}"
+        return "⚠️ رفع الصور غير متاح حاليًا على السحابة. الرجاء رفع PDF أو DOCX أو TXT فقط."
+    
+    # للـ Windows local development
+    if platform.system() == "Windows":
+        try:
+            if pytesseract is None:
+                return "⚠️ Tesseract غير مثبت على النظام"
+            image = Image.open(file_path)
+            text = pytesseract.image_to_string(image, lang='ara+eng')
+            if len(text.strip()) < 10:
+                return "⚠️ لم يتم العثور على نص في الصورة"
+            return text
+        except Exception as e:
+            return f"خطأ في معالجة الصورة: {e}"
+    
+    # لأي نظام تاني مش Windows
+    return "⚠️ معالجة الصور متاحة فقط على نظام Windows. الرجاء رفع ملف PDF أو DOCX أو TXT."
 
 def process_html(file_path: str) -> str:
     """استخراج النص من HTML"""
