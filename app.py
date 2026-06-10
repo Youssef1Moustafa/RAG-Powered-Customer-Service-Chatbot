@@ -7,6 +7,8 @@ import streamlit as st
 from rag_pipeline import TelecomRAG
 from document_processor import process_uploaded_file
 import os
+import time
+time.sleep(5)  # انتظر 5 ثواني عشان النماذج تتحمل
 
 # إعدادات الصفحة
 st.set_page_config(
