@@ -12,7 +12,7 @@ time.sleep(5)  # انتظر 5 ثواني عشان النماذج تتحمل
 
 # إعدادات الصفحة
 st.set_page_config(
-    page_title="we Assistant - Telecom Egypt",
+    page_title="We Assistant - Telecom Egypt",
     page_icon="📞",
     layout="wide",
     initial_sidebar_state="expanded"
