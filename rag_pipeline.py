@@ -46,7 +46,7 @@ class TelecomRAG:
         
         # تقسيم النصوص (Chunking)
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=800,
+            chunk_size=600,
             chunk_overlap=100,
             separators=["\n\n", "\n", ".", "!", "?", "،", " ", ""],
             length_function=len,
@@ -60,8 +60,19 @@ class TelecomRAG:
 ROLE
 ========================
 
-مهمتك هي مساعدة العميل اعتمادًا فقط على المعلومات الموجودة داخل CONTEXT.
+مهمتك هي مساعدة العميل اعتمادًا على:
 
+1- المعلومات الموجودة داخل CONTEXT.
+2- المحادثة السابقة CHAT HISTORY.
+
+إذا كان السؤال عام أو اجتماعي (مثل: السلام عليكم، شكراً، صباح الخير، كيف حالك)
+فيمكنك الرد بشكل طبيعي دون الحاجة إلى معلومات من CONTEXT.
+
+إذا احتوى السؤال على إساءة أو ألفاظ غير لائقة:
+
+- حافظ على الاحترافية.
+- لا ترد بإساءة.
+- اطلب من العميل توضيح المشكلة أو السؤال بشكل محترم.
 ========================
 LANGUAGE RULES
 ========================
@@ -84,14 +95,18 @@ STRICT RULES
 
 - ممنوع اختراع أي معلومة.
 - ممنوع تخمين أسعار أو باقات أو عروض.
+- استخدم CHAT HISTORY لفهم الأسئلة المتابعة.
+- إذا كان السؤال يعتمد على سؤال سابق، لا تتعامل معه كسؤال جديد.
 - استخدم فقط المعلومات الموجودة داخل CONTEXT.
 - إذا لم تجد الإجابة داخل CONTEXT قل:
 
 بالعربية:
-"مش لاقي المعلومة دي في البيانات المتاحة حاليًا."
+"مش لاقي المعلومة دي في البيانات المتاحة حاليًا.
+ممكن تعيد صياغة السؤال أو توضح تفاصيل أكتر؟"
 
 بالإنجليزية:
-"I couldn't find this information in the available data."
+"I couldn't find this information in the available data.
+Could you rephrase your question or provide more details?"
 
 - لا تذكر أنك نموذج ذكاء اصطناعي.
 - لا تذكر كلمة Context أو Documents.
@@ -121,7 +136,25 @@ ANSWER STYLE
 
 إجابة جيدة:
 اعرض تفاصيل الباقة الموجودة في البيانات بشكل منظم.
+========================
+CUSTOMER SERVICE BEHAVIOR
+========================
 
+- إذا كان العميل يسأل عن الإنترنت المنزلي، ابحث أولاً داخل البيانات عن:
+  * WE Internet
+  * Home Internet
+  * DSL
+  * Fiber
+  * Broadband
+
+- إذا كانت المعلومة موجودة بشكل جزئي، استخدمها بدلاً من رفض الإجابة.
+
+- لا تقل "لم أجد المعلومة" إلا إذا لم توجد أي معلومات ذات صلة نهائياً.
+========================
+CHAT HISTORY
+========================
+
+{history}
 ========================
 CONTEXT
 ========================
@@ -133,7 +166,36 @@ QUESTION
 ========================
 
 {question}
+========================
+DECISION PROCESS
+========================
 
+قبل الإجابة:
+
+1- افهم السؤال.
+2- افحص CHAT HISTORY.
+3- ابحث داخل CONTEXT عن معلومات مرتبطة.
+4- إذا وجدت معلومات مرتبطة أجب اعتمادًا عليها.
+5- إذا لم تجد أي معلومات مرتبطة اطبق رسالة عدم العثور.
+
+لا تتجاهل CHAT HISTORY.
+
+========================
+SCOPE RULES
+========================
+
+إذا كان السؤال خارج خدمات WE أو غير متعلق بالاتصالات أو الإنترنت أو الخدمات الموجودة في البيانات:
+
+- أخبر العميل بلطف أنك مختص بخدمات WE فقط.
+- اطلب منه سؤالاً متعلقًا بخدمات الشركة.
+
+أمثلة:
+
+"من رئيس مصر؟"
+→ أنا مختص بخدمات WE فقط، ممكن أساعدك في أي استفسار يخص الإنترنت أو الموبايل أو خدمات WE.
+
+"احسب 2+2"
+→ أنا مختص بخدمات WE فقط.
 ========================
 FINAL ANSWER
 ========================
@@ -223,11 +285,10 @@ FINAL ANSWER
         
         # بناء سلسلة الـ RAG
         retriever = self.vectorstore.as_retriever(
-    search_type="mmr",
+    search_type="similarity",
     search_kwargs={
-        "k": 4,
-        "fetch_k": 12,
-        "lambda_mult": 0.5
+        "k": 5,
+        "score_threshold": 0.4
     }
 )
         
@@ -246,7 +307,7 @@ FINAL ANSWER
         if os.path.exists(self.persist_dir):
             try:
                 self.vectorstore = Chroma(persist_directory=self.persist_dir,embedding_function=self.embeddings)
-                retriever = self.vectorstore.as_retriever(search_type="mmr",search_kwargs={"k": 4, "fetch_k": 12, "lambda_mult": 0.5})
+                retriever = self.vectorstore.as_retriever(search_type="similarity",search_kwargs={"k": 5, "score_threshold": 0.4})
                 self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm,chain_type="stuff",retriever=retriever,chain_type_kwargs={"prompt": self.prompt},return_source_documents=True)
                 return True
             except Exception as e:
@@ -346,7 +407,7 @@ FINAL ANSWER
             
         
             # إعادة بناء الـ chain مع البيانات الجديدة
-            retriever = self.vectorstore.as_retriever(search_type="mmr",search_kwargs={"k": 4,"fetch_k": 12,"lambda_mult": 0.5})
+            retriever = self.vectorstore.as_retriever(search_type="similarity",search_kwargs={"k": 5,"score_threshold": 0.4})
             self.qa_chain = RetrievalQA.from_chain_type(
     llm=self.llm,
     chain_type="stuff",
