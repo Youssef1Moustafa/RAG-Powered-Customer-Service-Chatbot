@@ -9,7 +9,13 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_groq import ChatGroq
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain.chains import RetrievalQA
+#from langchain.chains import RetrievalQA
+
+from langchain.chains import create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains.history_aware_retriever import create_history_aware_retriever
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
 from langchain.prompts import PromptTemplate
 import os
 from typing import List, Tuple, Dict
@@ -150,11 +156,7 @@ CUSTOMER SERVICE BEHAVIOR
 - إذا كانت المعلومة موجودة بشكل جزئي، استخدمها بدلاً من رفض الإجابة.
 
 - لا تقل "لم أجد المعلومة" إلا إذا لم توجد أي معلومات ذات صلة نهائياً.
-========================
-CHAT HISTORY
-========================
 
-{history}
 ========================
 CONTEXT
 ========================
@@ -165,7 +167,7 @@ CONTEXT
 QUESTION
 ========================
 
-{question}
+{input}
 ========================
 DECISION PROCESS
 ========================
@@ -201,10 +203,31 @@ FINAL ANSWER
 ========================
 """
         
-        self.prompt = PromptTemplate(
-            template=self.prompt_template,
-            input_variables=["context", "question", "history"]
-        )
+        qa_prompt = ChatPromptTemplate.from_messages([
+            ("system",self.prompt_template),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}")
+        ])
+        contextualize_q_prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                """   
+اعتماداً على المحادثة السابقة،
+حوّل السؤال الحالي إلى سؤال كامل وواضح ومستقل.
+
+لا تجب على السؤال.
+فقط أعد صياغته إذا احتاج ذلك.
+"""
+),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}")
+])
+        question_answer_chain = create_stuff_documents_chain(
+            self.llm,
+            qa_prompt 
+)
+        self.contextualize_q_prompt = contextualize_q_prompt
+        self.question_answer_chain = question_answer_chain
         
         self.vectorstore = None
         self.qa_chain = None
@@ -286,21 +309,15 @@ FINAL ANSWER
         
         # بناء سلسلة الـ RAG
         retriever = self.vectorstore.as_retriever(
-    search_type="similarity",
-    search_kwargs={
-        "k": 5
+            search_type="similarity",
+            search_kwargs={"k": 5})
+        history_aware_retriever = create_history_aware_retriever(
+            self.llm,
+            retriever,
+            self.contextualize_q_prompt
+        )
         
-    }
-)
-        
-        self.qa_chain = RetrievalQA.from_chain_type(
-    llm=self.llm,
-    chain_type="stuff",
-    retriever=retriever,
-    chain_type_kwargs={"prompt": self.prompt,
-                      "document_variable_name": "context"},
-    return_source_documents=True
-)
+        self.qa_chain = create_retrieval_chain(history_aware_retriever,self.question_answer_chain)
         
         print("✅ تم بناء RAG Pipeline بنجاح")
         return True
@@ -309,8 +326,19 @@ FINAL ANSWER
         if os.path.exists(self.persist_dir):
             try:
                 self.vectorstore = Chroma(persist_directory=self.persist_dir,embedding_function=self.embeddings)
-                retriever = self.vectorstore.as_retriever(search_type="similarity",search_kwargs={"k": 5})
-                self.qa_chain = RetrievalQA.from_chain_type(llm=self.llm,chain_type="stuff",retriever=retriever,chain_type_kwargs={"prompt": self.prompt,"document_variable_name": "context"},return_source_documents=True)
+                retriever = self.vectorstore.as_retriever(
+    search_type="similarity",
+    search_kwargs={"k": 5}
+)
+                history_aware_retriever = create_history_aware_retriever(
+    self.llm,
+    retriever,
+    self.contextualize_q_prompt
+)
+                self.qa_chain = create_retrieval_chain(
+    history_aware_retriever,
+    self.question_answer_chain
+)
                 return True
             except Exception as e:
                 print(f"⚠️ خطأ في تحميل قاعدة البيانات: {e}")
@@ -338,23 +366,26 @@ FINAL ANSWER
                 lang = "ar"
             
             # 🔧 تم التعديل: استخدام invoke بدل الاتصال المباشر
-            history_text = ""
+            chat_history_langchain = []
 
             if chat_history:
                 for msg in chat_history[-8:]:
-                    history_text += f"{msg['role']}: {msg['content']}\n"
+                    if msg["role"] == "user":
+                        chat_history_langchain.append(("human", msg["content"]))
+                    else:
+                        chat_history_langchain.append(("ai", msg["content"]))
             result = self.qa_chain.invoke({
-                "query": question,
-                "history": history_text})
+                "input": question,
+                "chat_history": chat_history_langchain})
     
-            response = result['result']
+            response = result['answer']
 
             response = response.strip()
             
             
             # استخراج المصادر
             sources = []
-            for doc in result.get('source_documents', []):
+            for doc in result.get("context", []):
                 source = doc.metadata.get('source', '')
                 title = doc.metadata.get('title', '')
                 
@@ -399,17 +430,21 @@ FINAL ANSWER
             
         
             # إعادة بناء الـ chain مع البيانات الجديدة
-            retriever = self.vectorstore.as_retriever(search_type="similarity",search_kwargs={"k": 5})
-            self.qa_chain = RetrievalQA.from_chain_type(
-    llm=self.llm,
-    chain_type="stuff",
-    retriever=retriever,
-    chain_type_kwargs={"prompt": self.prompt,
-                      "document_variable_name": "context"},
-    return_source_documents=True
+            retriever = self.vectorstore.as_retriever(
+    search_type="similarity",
+    search_kwargs={"k": 5}
 )
-            
-        
+            history_aware_retriever = create_history_aware_retriever(
+
+
+    self.llm,
+    retriever,
+    self.contextualize_q_prompt
+)
+            self.qa_chain = create_retrieval_chain(
+    history_aware_retriever,
+    self.question_answer_chain
+)
             return True
         except Exception as e:
             print(f"⚠️ خطأ في إضافة المستند: {e}")
