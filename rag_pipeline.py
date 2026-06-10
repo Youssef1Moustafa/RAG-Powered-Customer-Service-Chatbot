@@ -13,8 +13,8 @@ from langchain_community.vectorstores import Chroma
 
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.chains.history_aware_retriever import create_history_aware_retriever
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import HumanMessage, AIMessage
 
 from langchain.prompts import PromptTemplate
 import os
@@ -310,8 +310,8 @@ FINAL ANSWER
         self.vectorstore = Chroma.from_texts(
             texts=all_chunks,
             embedding=self.embeddings,
-            metadatas=all_metadatas,
-            persist_directory=self.persist_dir)
+            metadatas=all_metadatas
+            )
         
         # بناء سلسلة الـ RAG
         retriever = self.vectorstore.as_retriever(
@@ -372,14 +372,20 @@ FINAL ANSWER
                 lang = "ar"
             
             # 🔧 تم التعديل: استخدام invoke بدل الاتصال المباشر
-            chat_history_langchain = []
 
+            chat_history_langchain = []
             if chat_history:
                 for msg in chat_history[-8:]:
                     if msg["role"] == "user":
-                        chat_history_langchain.append(("human", msg["content"]))
-                    else:
-                        chat_history_langchain.append(("ai", msg["content"]))
+                        chat_history_langchain.append(
+                            HumanMessage(content=msg["content"])
+                        )
+                    elif msg["role"] == "assistant":
+                        chat_history_langchain.append(
+                            AIMessage(content=msg["content"])
+                        )
+
+            
             result = self.qa_chain.invoke({
                 "input": question,
                 "chat_history": chat_history_langchain})
@@ -430,8 +436,8 @@ FINAL ANSWER
                 self.vectorstore = Chroma.from_texts(
                 texts=chunks,
                 embedding=self.embeddings,
-                metadatas=metadatas,
-                persist_directory=self.persist_dir               
+                metadatas=metadatas
+                             
             )
             
         
