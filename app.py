@@ -110,30 +110,21 @@ with st.sidebar:
     
     # تحميل البيانات
     st.header("🌐 بيانات الموقع الرسمي")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("📥 تحميل البيانات", use_container_width=True):
-            with st.spinner("جاري تحميل بيانات الموقع..."):
-                documents = st.session_state.rag.load_documents_from_folder()
-                if documents:
-                    success = st.session_state.rag.create_vectorstore(documents)
-                    if success:
-                        st.session_state.initialized = True
-                        st.success(f"✅ تم تحميل {len(documents)} صفحة بنجاح!")
-                    else:
-                        st.error("❌ فشل في إنشاء قاعدة البيانات")
+    if st.button("📥 تحميل البيانات", use_container_width=True):
+        with st.spinner("جاري تحميل بيانات الموقع..."):
+            documents = st.session_state.rag.load_documents_from_folder()
+            if documents:
+                success = st.session_state.rag.create_vectorstore(documents)
+                if success:
+                    st.session_state.initialized = True    
+                    st.success(f"✅ تم تحميل {len(documents)} صفحة بنجاح!")
                 else:
-                    st.warning("⚠️ مفيش بيانات موجودة. اعمل تشغيل scraper.py الأول")
-    
-    with col2:
-        if st.button("🔄 إعادة تحميل", use_container_width=True):
-            st.session_state.initialized = st.session_state.rag.load_existing_vectorstore()
-            if st.session_state.initialized:
-                st.success("✅ تم تحميل قاعدة البيانات الموجودة")
+                    st.error("❌ فشل في إنشاء قاعدة البيانات")
+                        
             else:
-                st.warning("⚠️ مفيش قاعدة بيانات موجودة")
-    
+                st.warning("⚠️ مفيش بيانات موجودة. اعمل تشغيل scraper.py الأول")
+                    
+        
     st.divider()
     
     # رفع الملفات
