@@ -1,11 +1,11 @@
 streamlit==1.41.0
-langchain==0.3.25
-langchain-community==0.3.24
-langchain-core==0.3.59
+langchain==0.2.1
+langchain-community==0.2.1
+langchain-core==0.2.21
 langchain-text-splitters==0.2.1
 langchain-groq
 sentence-transformers
-chromadb==0.5.23
+chromadb==0.4.24
 beautifulsoup4==4.12.3
 requests==2.31.0
 pypdf==4.0.1
