@@ -26,6 +26,8 @@ import re
 import tempfile 
 import shutil
 import uuid
+import streamlit as st
+
 
 def clean_text(text: str) -> str:
     # إزالة unicode invalid
@@ -35,6 +37,13 @@ def clean_text(text: str) -> str:
     text = re.sub(r"[\x00-\x1f\x7f-\x9f]", "", text)
     
     return text.strip()
+@st.cache_resource
+def load_embeddings():
+    return HuggingFaceEmbeddings(
+        model_name="intfloat/multilingual-e5-small",
+        model_kwargs={'device': 'cpu'},
+        encode_kwargs={'normalize_embeddings': True}
+    )
 class TelecomRAG:
     def __init__(self, model_name: str = "llama3-70b-8192"):
         """
